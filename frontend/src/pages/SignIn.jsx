@@ -21,9 +21,10 @@ const SignIn = () => {
     try {
       let result = await axios.post(`${serverUrl}/api/auth/signin`, { email, password }, { withCredentials: true });
       // console.log(result.data);
+      console.log(result)
       setUserData(result.data)
-      setLoading(false)
       navigate("/"); // redirect to home/dashboard after login
+      setLoading(false)
     } catch (error) {
       console.error("SignIn Error:", error.response?.data || error.message);
       setUserData(null)

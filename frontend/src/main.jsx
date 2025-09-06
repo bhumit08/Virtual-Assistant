@@ -4,10 +4,10 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import UserContext from './context/userContext.jsx'
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-  <UserContext>
-    <App />
-  </UserContext>
+    <UserContext>
+      <App />
+    </UserContext>
   </BrowserRouter>
-)
+);

@@ -2,7 +2,7 @@ import genToken from "../config/token.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
-export const singUp = async (req, res) => {
+export const signUp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const existEmail = await User.findOne({ email });
@@ -24,9 +24,9 @@ export const singUp = async (req, res) => {
 
     const token = await genToken(user._id);
 
-    res.cookie("token", token, {
+    res.cookie("token",token, {
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 7*24*60*60*1000,
       sameSite: "strict",
       secure: false,
     });

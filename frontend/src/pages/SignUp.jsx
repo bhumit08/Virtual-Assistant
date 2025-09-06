@@ -21,9 +21,10 @@ const SignUp = () => {
     setLoading(true)
     try {
       let result = await axios.post(`${serverUrl}/api/auth/signup`, { name, email, password }, { withCredentials: true });
+      console.log(result)
       setUserData(result.data)
+      setLoading(false)
       navigate("/customize");
-          setLoading(false)
 
     } catch (error) {
       console.error("SignUp Error:", error.response?.data || error.message);
@@ -40,9 +41,9 @@ const SignUp = () => {
 
         <h1 className="text-white text-[30px] font-semibold mb-[30px]">Register to <span className="text-blue-400">Virtual Assistant</span></h1>
 
-        <input type="text" placeholder="Enter your Name" className="w-full h-[60px] outline-none border-2 border-white bg-transparent text-white placeholder-gray-300 px-[20px] rounded-full" required onChange={(e) => setName(e.target.value)} value={name} />
+        <input type="text" placeholder="Enter your Name" className="w-full h-[60px] outline-none border-2 border-white bg-transparent text-white placeholder-gray-300 text-[18px] px-[20px] rounded-full" required onChange={(e) => setName(e.target.value)} value={name} />
 
-        <input type="email" placeholder="Email" className="w-full h-[55px] outline-none border border-white bg-transparent text-white placeholder-gray-300 px-5 rounded-full text-lg" required onChange={(e) => setEmail(e.target.value)} value={email} />
+        <input type="email" placeholder="Email" className="w-full h-[55px] outline-none border border-white bg-transparent text-white placeholder-gray-300 text-[18px] px-5 rounded-full text-lg" required onChange={(e) => setEmail(e.target.value)} value={email} />
 
         <div className="relative w-full">
           <input type={showPassword ? "text" : "password"} placeholder="Password" className="w-full h-[55px] outline-none border border-white bg-transparent text-white placeholder-gray-300 px-5 rounded-full text-lg" required onChange={(e) => setPassword(e.target.value)} value={password} />

@@ -1,15 +1,15 @@
 
+
 import express from "express";
-import { getCurrentUser, updateUser } from "../controllers/user.controllers.js";
+import { getCurrentUser, updateAssistant } from "../controllers/user.controllers.js";
 import isAuth from "../middlewares/isAuth.js";
+import upload from "../middlewares/multer.js";
 
 const userRouter = express.Router();
 
-// Get current user
 userRouter.get("/current", isAuth, getCurrentUser);
 
-// Update user (assistant name, image, etc.)
-userRouter.post("/update", isAuth, updateUser);
+// ✅ route expects multipart form with key = "assistantImage"
+userRouter.post("/update", isAuth, upload.single("assistantImage"), updateAssistant);
 
 export default userRouter;
-
