@@ -42,7 +42,7 @@ const Customize2 = () => {
       setUserData(result.data);
       console.log(result.data)
       setMessage("Assistant updated successfully!");
-      // navigate("/customize2")
+      navigate("/")
     } catch (error) {
       console.error(error);
       setMessage("Something went wrong. Please try again.");

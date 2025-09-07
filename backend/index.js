@@ -6,6 +6,7 @@ import authRouter from './routes/auth.routes.js'
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import userRouter from './routes/user.routes.js'
+import geminiResponse from './gemini.js'
 // import bodyParser from 'body-parser';
 
 const app=express()
@@ -23,15 +24,17 @@ const port=process.env.PORT || 5000
 
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGI4NTA2NDFkZWQzZDA3Mjc4YWIyOTYiLCJpYXQiOjE3NTcxMzI0NDMsImV4cCI6MTc1Nzk5NjQ0M30.a1gYFrPq9u2iUcDYsOv6fJ4lOLVP90KMerUgtOFYnDA
 
-app.get('/',(req,res)=>{
-  res.json("hello worldddddd").status(400)
-})
 
 app.use(express.json())
 app.use(cookieParser());
 app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)
 
+// app.get("/",async (req,res)=>{
+//   let prompt=req.query.prompt
+//   let data= await geminiResponse(prompt)
+//   res.json(data)
+// })
 
 app.listen(port,()=>{
   connectDB()
