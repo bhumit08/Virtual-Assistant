@@ -1,147 +1,3 @@
-
-// // ✅ Utility to ensure voices are loaded before use
-// const loadVoices = () => {
-//   return new Promise((resolve) => {
-//     let voices = window.speechSynthesis.getVoices();
-//     if (voices.length !== 0) {
-//       resolve(voices);
-//     } else {
-//       window.speechSynthesis.onvoiceschanged = () => {
-//         voices = window.speechSynthesis.getVoices();
-//         resolve(voices);
-//       };
-//     }
-//   });
-// };
-
-
-// import React, { useContext, useEffect } from 'react'
-// import { userDataContext } from '../context/userContext'
-// import { useNavigate } from 'react-router-dom'
-// import axios from 'axios'
-
-
-// const Home = () => {
-//   const {userData,serverUrl,setUserData,getGeminiResponse}=useContext(userDataContext)
-//   const navigate=useNavigate()
-
-//   const handleLogOut=async()=>{
-//       try{
-//         const result=await axios.get(`${serverUrl}/api/auth/logout`,{withCredentials:true})
-//         setUserData(null)
-//         navigate("/signin")
-
-//       }catch(error){
-//         setUserData(null)
-//         console.log(error)
-//       }
-//   }
-
-
-//   const speak = async (text) => {
-//   if (!text) return;
-
-//   const utterance = new SpeechSynthesisUtterance(text);
-//   utterance.lang = "en-US";
-//   utterance.rate = 1;
-//   utterance.pitch = 1;
-
-//   const voices = await loadVoices();
-//   utterance.voice = voices.find(v => v.lang === "en-US") || voices[0];
-
-//   console.log("Speaking:", text);
-//   window.speechSynthesis.cancel();
-//   window.speechSynthesis.speak(utterance);
-// };
-
-
-//   // const speak=(text)=>{
-//   //   const utterence=new SpeechSynthesisUtterance(text)
-//   //   window.speechSynthesis.speak(utterence)
-//   // }
-
-// //   const speak = (text) => {
-// //   if (!text) return;
-
-// //   const utterance = new SpeechSynthesisUtterance(text);
-// //   utterance.lang = "en-US";
-// //   utterance.rate = 1;   // speaking speed
-// //   utterance.pitch = 1;  // voice pitch
-
-// //   // stop ongoing speech before starting new
-// //   window.speechSynthesis.cancel();
-// //   window.speechSynthesis.speak(utterance);
-// // };
-
-
-// useEffect(() => {
-//   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-//   if (!SpeechRecognition) {
-//     console.log("SpeechRecognition API is not supported in this browser");
-//     return;
-//   }
-
-//   const recognition = new SpeechRecognition();
-//   recognition.continuous = true;
-//   recognition.lang = "en-US";
-
-//   // recognition.onresult = async (event) => {
-//   //   const transcript = event.results[event.results.length - 1][0].transcript.trim();
-//   //   console.log("heard:", transcript);
-
-//   //   if (transcript.toLowerCase().includes(userData.assistantName.toLowerCase())) {
-//   //     const data = await getGeminiResponse(transcript);
-//   //     console.log(data);
-//   //     speak(data.response);
-//   //   }
-//   // };
-
-
-//   recognition.onresult = async (event) => {
-//   const transcript = event.results[event.results.length - 1][0].transcript.trim();
-//   console.log("heard:", transcript);
-
-//   if (transcript.toLowerCase().includes(userData.assistantName.toLowerCase())) {
-//     const data = await getGeminiResponse(transcript);
-//     console.log("Assistant response:", data);
-
-//     if (data && data.response) {
-//       speak(data.response);  // now guaranteed to speak
-//     } else {
-//       console.warn("No response text to speak");
-//     }
-//   }
-// };
-
-
-//   recognition.start();
-
-//   return () => recognition.stop();
-// }, []);
-
-//   return (
-//     <div className='w-full h-[100vh] bg-gradient-to-t from-black to-[#02023d] flex justify-center items-center flex-col gap-[15px]'>
-
-// <button type="submit" className="min-w-[150px] h-[60px] text-black mt-7 font-semibold cursor-pointer bg-white absolute top-[20px] right-[20px]  rounded-full text-[19px]" onClick={handleLogOut}>Log Out</button>
-
-// <button type="submit" className="min-w-[150px] h-[60px] text-black mt-7 font-semibold cursor-pointer bg-white absolute top-[100px] right-[20px] px-[20px] py-[10px] rounded-full text-[19px]" onClick={()=>navigate("/customize")}>Customize Your Assistant</button>
-
-//       <div className='w-[300px] h-[400px] flex justify-center items-center overflow-hidden rounded-4xl shadow-4xl shadow-lg'>
-
-//     <img src={userData?.assistantImage} alt="" className='h-full object-cover '/>
-//       </div>
-//       <h1 className='text-white text-[18px] font-semibold'>I'm {userData.assistantName}</h1>
-//     </div>
-//   )
-// }
-
-// export default Home
-
-
-
-
-
 import React, { useContext, useEffect, useState } from "react";
 import { CgMenuRight } from "react-icons/cg";
 import { RxCross1 } from "react-icons/rx";
@@ -174,6 +30,7 @@ const Home = () => {
   const [userText, setUserText] = useState("");
   const [aiText, setAiText] = useState("");
   const [ham, setHam] = useState(false);
+  const [isListening, setIsListening] = useState(true);
 
   const handleLogOut = async () => {
     try {
@@ -188,14 +45,13 @@ const Home = () => {
     }
   };
 
-  // ✅ Speak function
   const speak = async (text) => {
     if (!text) return;
     window.speechSynthesis.cancel();
     const voices = await loadVoices();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-IN"; // good for English + Hinglish
+    utterance.lang = "en-IN";
     utterance.rate = 1;
     utterance.pitch = 1;
 
@@ -204,11 +60,16 @@ const Home = () => {
     if (englishVoice) utterance.voice = englishVoice;
 
     window.speechSynthesis.speak(utterance);
+
+    utterance.onend = () => {
+      setIsListening(true);
+    };
   };
 
   const handleCommand = (data) => {
     const { type, userInput, response } = data;
     speak(response);
+    setIsListening(false); 
 
     if (type === "google-search") {
       const query = encodeURIComponent(userInput);
@@ -236,16 +97,19 @@ const Home = () => {
   };
 
   useEffect(() => {
-    // const greeting = new SpeechSynthesisUtterance(
-    //   `Hello ${userData.name}, what can I help you with?`
-    // );
-    // greeting.lang = "en-IN";
-    // window.speechSynthesis.speak(greeting);
+    const greeting = new SpeechSynthesisUtterance(
+      `Hello ${userData.name}, what can I help you with?`
+    );
+    greeting.lang = "en-IN";
+    window.speechSynthesis.speak(greeting);
+  }, []);
 
+  useEffect(() => {
     if (!activated) return;
 
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
+
     if (!SpeechRecognition) {
       console.log("SpeechRecognition API is not supported in this browser");
       return;
@@ -255,14 +119,16 @@ const Home = () => {
     recognition.continuous = true;
     recognition.lang = "en-IN";
 
+    // Handle recognition results
     recognition.onresult = async (event) => {
       const transcript =
         event.results[event.results.length - 1][0].transcript.trim();
-      console.log("heard:", transcript);
+      console.log("Heard:", transcript);
 
-      if (
-        transcript.toLowerCase().includes(userData.assistantName.toLowerCase())
-      ) {
+      const assistantName = userData.assistantName.toLowerCase();
+      const normalizedTranscript = transcript.toLowerCase();
+
+      if (normalizedTranscript.includes(assistantName)) {
         setAiText(" ");
         setUserText(transcript);
         const data = await getGeminiResponse(transcript);
@@ -270,10 +136,30 @@ const Home = () => {
         handleCommand(data);
         setAiText(data.response);
         setUserText("");
+      } else {
+        console.log(
+          `Assistant name "${assistantName}" not detected in transcript.`
+        );
       }
     };
 
+    recognition.onstart = () => {
+      console.log("SpeechRecognition started");
+    };
+
+    // Restart recognition when it stops
+    recognition.onend = () => {
+      console.log("SpeechRecognition stopped. Restarting...");
+      recognition.start();
+    };
+
+    // Handle errors
+    recognition.onerror = (event) => {
+      console.error("SpeechRecognition error:", event.error);
+    };
+
     recognition.start();
+
     return () => recognition.stop();
   }, [activated]);
 
@@ -296,7 +182,6 @@ const Home = () => {
           >
             <CgMenuRight className="w-6 h-6" />
           </button>
-
           <div
             className={`fixed inset-0 z-40 transition ${
               ham ? "pointer-events-auto" : "pointer-events-none"
@@ -397,7 +282,7 @@ const Home = () => {
             I’m <span className="text-green-400">{userData.assistantName}</span>
           </h1>
           <div className="mt-6">
-            {!aiText ? (
+            {isListening ? (
               <img src={userImg} alt="Listening" className="w-32 sm:w-40" />
             ) : (
               <img src={aiImg} alt="Speaking" className="w-32 sm:w-40" />
@@ -410,3 +295,4 @@ const Home = () => {
 };
 
 export default Home;
+
