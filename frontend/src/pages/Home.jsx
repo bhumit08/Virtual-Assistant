@@ -30,7 +30,7 @@ const Home = () => {
   const [userText, setUserText] = useState("");
   const [aiText, setAiText] = useState("");
   const [ham, setHam] = useState(false);
-  const [isListening, setIsListening] = useState(true);
+  const [isListening, setIsListening] = useState(true); // Track listening state for GIF
 
   const handleLogOut = async () => {
     try {
@@ -45,13 +45,14 @@ const Home = () => {
     }
   };
 
+  // ✅ Speak function
   const speak = async (text) => {
     if (!text) return;
     window.speechSynthesis.cancel();
     const voices = await loadVoices();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-IN";
+    utterance.lang = "en-IN"; // Good for English + Hinglish
     utterance.rate = 1;
     utterance.pitch = 1;
 
@@ -61,6 +62,7 @@ const Home = () => {
 
     window.speechSynthesis.speak(utterance);
 
+    // Reset GIF to "listening" after speaking ends
     utterance.onend = () => {
       setIsListening(true);
     };
@@ -69,7 +71,7 @@ const Home = () => {
   const handleCommand = (data) => {
     const { type, userInput, response } = data;
     speak(response);
-    setIsListening(false); 
+    setIsListening(false); // Switch to "speaking" GIF
 
     if (type === "google-search") {
       const query = encodeURIComponent(userInput);
@@ -102,14 +104,11 @@ const Home = () => {
     );
     greeting.lang = "en-IN";
     window.speechSynthesis.speak(greeting);
-  }, []);
 
-  useEffect(() => {
     if (!activated) return;
 
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
-
     if (!SpeechRecognition) {
       console.log("SpeechRecognition API is not supported in this browser");
       return;
@@ -119,12 +118,12 @@ const Home = () => {
     recognition.continuous = true;
     recognition.lang = "en-IN";
 
-    // Handle recognition results
     recognition.onresult = async (event) => {
       const transcript =
         event.results[event.results.length - 1][0].transcript.trim();
       console.log("Heard:", transcript);
 
+      // Ensure assistant name is detected properly
       const assistantName = userData.assistantName.toLowerCase();
       const normalizedTranscript = transcript.toLowerCase();
 
@@ -143,23 +142,7 @@ const Home = () => {
       }
     };
 
-    recognition.onstart = () => {
-      console.log("SpeechRecognition started");
-    };
-
-    // Restart recognition when it stops
-    recognition.onend = () => {
-      console.log("SpeechRecognition stopped. Restarting...");
-      recognition.start();
-    };
-
-    // Handle errors
-    recognition.onerror = (event) => {
-      console.error("SpeechRecognition error:", event.error);
-    };
-
     recognition.start();
-
     return () => recognition.stop();
   }, [activated]);
 
@@ -182,6 +165,7 @@ const Home = () => {
           >
             <CgMenuRight className="w-6 h-6" />
           </button>
+
           <div
             className={`fixed inset-0 z-40 transition ${
               ham ? "pointer-events-auto" : "pointer-events-none"
